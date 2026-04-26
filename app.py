@@ -296,6 +296,7 @@ def apply_page_style():
         }
 
         .mc-help-box,
+        .game-guide-box,
         .copyright-box {
             background: #2b2b2b;
             color: #f5f5f5;
@@ -328,6 +329,25 @@ def apply_page_style():
             border: 2px solid #2f6b35;
             padding: 2px 6px;
             font-weight: 900;
+        }
+
+        .game-guide-title {
+            color: #55ff55;
+            font-weight: 900;
+            font-size: 18px;
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 10px;
+        }
+
+        .game-guide-text {
+            color: #e8e8e8;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.8;
+        }
+
+        .game-guide-text strong {
+            color: #ffff55;
         }
 
         .copyright-title {
@@ -374,7 +394,28 @@ def render_app_title():
 
 
 # ============================================================
-# Chapter 9. 캐싱 설명 영역
+# Chapter 9. 게임 설명 영역
+# ============================================================
+# 첫 화면에서 조합 방법, 점수 시스템, 게임 목표를 안내합니다.
+def render_game_guide():
+    st.markdown(
+        """
+        <div class="game-guide-box">
+            <div class="game-guide-title">게임 안내</div>
+            <div class="game-guide-text">
+                1. 인벤토리에서 재료를 선택하거나 드래그해서 3x3 작업대 칸에 배치하세요.<br>
+                2. 모든 재료를 올바르게 배치한 뒤 <strong>정답 확인</strong> 버튼을 누르면 조합 결과가 판정됩니다.<br>
+                3. 틀려도 다시 시도할 수 있지만, <strong>퍼펙트 조합</strong>은 한 번에 맞힌 경우에만 기록됩니다.<br>
+                4. "긴 하루의 끝, 스티브가 따뜻한 저녁을 즐길 수 있도록 — 오늘의 조합을 모두 완성해주세요!"
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ============================================================
+# Chapter 10. 캐싱 설명 영역
 # ============================================================
 def render_cache_expander():
     with st.expander("캐싱 적용 위치: 퀴즈 데이터/아이템 데이터 로딩"):
@@ -389,7 +430,7 @@ def render_cache_expander():
 
 
 # ============================================================
-# Chapter 10. 저작권 안내 영역
+# Chapter 11. 저작권 안내 영역
 # ============================================================
 def render_copyright_notice():
     st.markdown(
@@ -409,7 +450,7 @@ def render_copyright_notice():
 
 
 # ============================================================
-# Chapter 11. 로그인 전 화면
+# Chapter 12. 로그인 전 화면
 # ============================================================
 def render_login_page():
     render_app_title()
@@ -423,6 +464,7 @@ def render_login_page():
         unsafe_allow_html=True,
     )
 
+    render_game_guide()
     render_cache_expander()
 
     st.subheader("로그인")
@@ -457,7 +499,7 @@ def render_login_page():
 
 
 # ============================================================
-# Chapter 12. 퀴즈 HTML 컴포넌트 생성
+# Chapter 13. 퀴즈 HTML 컴포넌트 생성
 # ============================================================
 def build_quiz_html(recipes, items, ending_image_src):
     recipes_json = json.dumps(recipes, ensure_ascii=False)
@@ -1183,7 +1225,7 @@ render();
 
 
 # ============================================================
-# Chapter 13. 로그인 후 실제 퀴즈 화면
+# Chapter 14. 로그인 후 실제 퀴즈 화면
 # ============================================================
 def render_quiz_page():
     render_app_title()
@@ -1207,7 +1249,7 @@ def render_quiz_page():
 
 
 # ============================================================
-# Chapter 14. main 함수
+# Chapter 15. main 함수
 # ============================================================
 def main():
     st.set_page_config(
@@ -1226,7 +1268,7 @@ def main():
 
 
 # ============================================================
-# Chapter 15. 실행 진입점
+# Chapter 16. 실행 진입점
 # ============================================================
 if __name__ == "__main__":
     main()
