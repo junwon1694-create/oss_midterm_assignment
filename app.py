@@ -17,28 +17,24 @@ import streamlit.components.v1 as components
 # ============================================================
 # Chapter 2. 기본 설정값
 # ============================================================
-# 과제 필수 조건:
-# 첫 화면에 제출자의 학번과 이름을 표시해야 합니다.
 STUDENT_ID = "2025511009"
 STUDENT_NAME = "최준원"
 
-# 로그인용 테스트 계정입니다.
 USERS = {
     "player": "1234",
 }
 
-# app.py가 있는 폴더를 기준으로 assets 폴더를 찾습니다.
-# 이렇게 하면 터미널 실행 위치가 조금 달라도 이미지 경로가 안정적으로 동작합니다.
+# app.py 기준으로 assets 폴더를 찾습니다.
 BASE_DIR = Path(__file__).resolve().parent
 ASSETS_DIR = BASE_DIR / "assets"
+
 ICON_PATH = ASSETS_DIR / "작업대.png"
+ENDING_IMAGE_PATH = ASSETS_DIR / "엔딩.png"
 
 
 # ============================================================
 # Chapter 3. 이미지 파일을 HTML용 data URI로 변환
 # ============================================================
-# HTML 컴포넌트 안에서 로컬 이미지를 안정적으로 보여주기 위해
-# 이미지 파일을 base64 data URI 형태로 변환합니다.
 def image_to_data_uri(path):
     """이미지 파일을 HTML img 태그에서 사용할 수 있는 data URI 문자열로 변환합니다."""
 
@@ -63,8 +59,8 @@ def image_to_data_uri(path):
 # ============================================================
 # Chapter 4. session_state 초기화
 # ============================================================
-# Streamlit은 버튼 클릭이나 입력 변경 때마다 app.py를 다시 실행합니다.
-# 로그인 상태처럼 유지되어야 하는 값은 st.session_state에 저장합니다.
+# Streamlit은 상호작용마다 app.py를 다시 실행하므로
+# 로그인 상태처럼 유지해야 하는 값은 session_state에 저장합니다.
 def init_session_state():
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
@@ -76,8 +72,7 @@ def init_session_state():
 # ============================================================
 # Chapter 5. 아이템 데이터 캐싱
 # ============================================================
-# 아이템 이미지는 퀴즈 중 반복해서 사용되므로
-# 한 번 data URI로 변환한 결과를 @st.cache_data로 캐싱합니다.
+# 아이템 이미지는 반복 사용되므로 한 번 data URI로 변환한 뒤 캐싱합니다.
 @st.cache_data
 def load_item_data():
     """assets 폴더의 아이템 이미지를 읽어 HTML에서 사용할 수 있는 데이터로 변환합니다."""
@@ -107,7 +102,6 @@ def load_item_data():
 
     for item_id, meta in item_files.items():
         image_path = ASSETS_DIR / meta["file"]
-
         items[item_id] = {
             "label": meta["label"],
             "fallback": meta["fallback"],
@@ -197,7 +191,6 @@ def load_quiz_data():
 # ============================================================
 # Chapter 7. Streamlit 페이지 스타일
 # ============================================================
-# 로그인 화면과 기본 Streamlit UI를 Minecraft 느낌으로 꾸밉니다.
 def apply_page_style():
     st.markdown(
         """
@@ -398,8 +391,6 @@ def render_cache_expander():
 # ============================================================
 # Chapter 10. 저작권 안내 영역
 # ============================================================
-# Minecraft 관련 명칭과 이미지가 Mojang/Microsoft의 자산일 수 있음을 안내합니다.
-# 과제용 비공식 프로젝트임을 첫 화면에 명확히 표시합니다.
 def render_copyright_notice():
     st.markdown(
         """
@@ -468,9 +459,10 @@ def render_login_page():
 # ============================================================
 # Chapter 12. 퀴즈 HTML 컴포넌트 생성
 # ============================================================
-def build_quiz_html(recipes, items):
+def build_quiz_html(recipes, items, ending_image_src):
     recipes_json = json.dumps(recipes, ensure_ascii=False)
     items_json = json.dumps(items, ensure_ascii=False)
+    ending_image_json = json.dumps(ending_image_src, ensure_ascii=False)
 
     return f"""
 <!DOCTYPE html>
@@ -782,21 +774,71 @@ body {{
 
 .final {{
     width: min(860px, 100%);
+    min-height: 720px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 10px 46px;
+}}
+
+.final-panel {{
+    width: min(760px, 100%);
+    background: #242424;
+    border: 4px solid;
+    border-color: #777 #111 #111 #777;
+    padding: 18px;
     text-align: center;
-    padding: 40px 10px;
+    box-shadow: inset 4px 4px 0 rgba(255,255,255,0.08),
+                inset -4px -4px 0 rgba(0,0,0,0.35);
+}}
+
+.final-art-wrap {{
+    width: 100%;
+    background: #111;
+    border: 3px solid;
+    border-color: #111 #777 #777 #111;
+    margin-bottom: 18px;
+    overflow: hidden;
+}}
+
+.final-art {{
+    display: block;
+    width: 100%;
+    max-height: 380px;
+    object-fit: contain;
+    image-rendering: auto;
 }}
 
 .final h1 {{
     color: #ffff55;
+    font-size: 32px;
     text-shadow: 3px 3px 0 #000;
+    margin: 8px 0 14px;
 }}
 
 .final-score {{
     color: #55ff55;
-    font-size: 44px;
+    font-size: 52px;
     font-weight: 900;
     text-shadow: 3px 3px 0 #000;
-    margin: 16px 0;
+    margin: 10px 0;
+}}
+
+.final-message {{
+    color: #fff8d7;
+    font-size: 18px;
+    font-weight: 900;
+    margin: 14px 0 10px;
+}}
+
+.final-time {{
+    display: inline-block;
+    background: #143d1d;
+    color: #9cff8f;
+    border: 2px solid #2f6b35;
+    padding: 8px 12px;
+    margin: 8px 0 18px;
+    font-weight: 900;
 }}
 </style>
 </head>
@@ -806,6 +848,7 @@ body {{
 <script>
 const RECIPES = {recipes_json};
 const ITEMS = {items_json};
+const ENDING_IMAGE = {ending_image_json};
 const SLOTS = ["1","2","3","4","5","6","7","8","9"];
 
 let qIndex = 0;
@@ -1078,14 +1121,23 @@ function showFinal() {{
     stopTimer();
 
     const finalSeconds = elapsedSeconds();
+    const endingImageHtml = ENDING_IMAGE
+        ? `<div class="final-art-wrap">
+               <img class="final-art" src="${{ENDING_IMAGE}}" alt="Quiz ending scene">
+           </div>`
+        : "";
 
     document.getElementById("app").innerHTML = `
         <div class="final">
-            <h1>퀴즈 완료</h1>
-            <div class="final-score">${{score}} / ${{RECIPES.length}}</div>
-            <p>${{gradeMessage()}}</p>
-            <p>총 소요 시간: ${{formatSeconds(finalSeconds)}}</p>
-            <button class="mc-btn" onclick="restartQuiz()">다시 풀기</button>
+            <div class="final-panel">
+                ${{endingImageHtml}}
+                <h1>퀴즈 완료</h1>
+                <div class="final-score">${{score}} / ${{RECIPES.length}}</div>
+                <div class="final-message">${{gradeMessage()}}</div>
+                <div class="final-time">총 소요 시간: ${{formatSeconds(finalSeconds)}}</div>
+                <br>
+                <button class="mc-btn" onclick="restartQuiz()">다시 풀기</button>
+            </div>
         </div>
     `;
 }}
@@ -1126,10 +1178,11 @@ def render_quiz_page():
 
     recipes = load_quiz_data()
     items = load_item_data()
+    ending_image_src = image_to_data_uri(ENDING_IMAGE_PATH)
 
     components.html(
-        build_quiz_html(recipes, items),
-        height=900,
+        build_quiz_html(recipes, items, ending_image_src),
+        height=1050,
         scrolling=True,
     )
 
