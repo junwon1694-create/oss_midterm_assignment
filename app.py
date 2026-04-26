@@ -165,7 +165,7 @@ def load_quiz_data():
             "question": "갑옷 거치대(Armor Stand)를 조합해보세요.",
             "target_item": "armor_stand",
             "available_items": ["stick", "stone_slab", "oak_planks"],
-            "hint": "위쪽 3칸은 막대기, 가운데도 막대기, 아래 가운데는 매끄러운 돌 반블록입니다.",
+            "hint": "위쪽 3칸은 막대기, 가운데도 막대기, 아래 줄은 막대기-매끄러운 돌 반블록-막대기 입니다.",
             "answer": {
                 "1": "stick", "2": "stick", "3": "stick",
                 "4": "", "5": "stick", "6": "",
@@ -818,9 +818,16 @@ body {{
 
 .final-score {{
     color: #55ff55;
-    font-size: 52px;
+    font-size: 42px;
     font-weight: 900;
     text-shadow: 3px 3px 0 #000;
+    margin: 10px 0;
+}}
+
+.final-complete {{
+    color: #8fd3ff;
+    font-size: 18px;
+    font-weight: 900;
     margin: 10px 0;
 }}
 
@@ -856,6 +863,7 @@ let score = 0;
 let selectedItem = "";
 let board = emptyBoard();
 let answered = false;
+let triedWrong = false;
 let startTime = Date.now();
 let timerId = null;
 
@@ -939,7 +947,7 @@ function render() {{
             <div class="score">
                 시간 <span id="timerText">${{formatSeconds(elapsedSeconds())}}</span>
                 &nbsp;|&nbsp;
-                점수 ${{score}} / ${{RECIPES.length}}
+                퍼펙트 조합 ${{score}} / ${{RECIPES.length}}
             </div>
         </div>
 
@@ -1084,15 +1092,23 @@ function checkAnswer() {{
     const fb = document.getElementById("feedback");
 
     if (ok) {{
-        score += 1;
+        if (!triedWrong) {{
+            score += 1;
+        }}
+
         answered = true;
         render();
 
+        const resultText = triedWrong
+            ? `정답입니다! ${{q.name}} 조합에 성공했습니다. (퍼펙트 조합 점수는 올라가지 않습니다.)`
+            : `정답입니다! ${{q.name}} 조합에 성공했습니다. (퍼펙트 조합 +1점!)`;
+
         document.getElementById("feedback").className = "feedback ok";
-        document.getElementById("feedback").textContent = `정답입니다! ${{q.name}} 조합에 성공했습니다.`;
+        document.getElementById("feedback").textContent = resultText;
     }} else {{
+        triedWrong = true;
         fb.className = "feedback fail";
-        fb.textContent = "오답입니다. 힌트를 보고 다시 배치해보세요.";
+        fb.textContent = "오답입니다. 다시 배치해보세요. 정답을 맞히면 다음 문제로 넘어갈 수 있습니다.";
     }}
 }}
 
@@ -1107,6 +1123,7 @@ function nextQuestion() {{
     board = emptyBoard();
     selectedItem = "";
     answered = false;
+    triedWrong = false;
     render();
 }}
 
@@ -1132,7 +1149,8 @@ function showFinal() {{
             <div class="final-panel">
                 ${{endingImageHtml}}
                 <h1>퀴즈 완료</h1>
-                <div class="final-score">${{score}} / ${{RECIPES.length}}</div>
+                <div class="final-complete">완성한 조합 ${{RECIPES.length}} / ${{RECIPES.length}}</div>
+                <div class="final-score">퍼펙트 조합 ${{score}} / ${{RECIPES.length}}</div>
                 <div class="final-message">${{gradeMessage()}}</div>
                 <div class="final-time">총 소요 시간: ${{formatSeconds(finalSeconds)}}</div>
                 <br>
@@ -1148,6 +1166,7 @@ function restartQuiz() {{
     selectedItem = "";
     board = emptyBoard();
     answered = false;
+    triedWrong = false;
     startTime = Date.now();
 
     stopTimer();
