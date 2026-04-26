@@ -302,7 +302,8 @@ def apply_page_style():
             color: #f5f5f5;
         }
 
-        .mc-help-box {
+        .mc-help-box,
+        .copyright-box {
             background: #2b2b2b;
             color: #f5f5f5;
             border: 3px solid;
@@ -334,6 +335,25 @@ def apply_page_style():
             border: 2px solid #2f6b35;
             padding: 2px 6px;
             font-weight: 900;
+        }
+
+        .copyright-title {
+            color: #ff5555;
+            font-weight: 900;
+            font-size: 18px;
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 8px;
+        }
+
+        .copyright-text {
+            color: #e8e8e8;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.7;
+        }
+
+        .copyright-text strong {
+            color: #ffff55;
         }
         </style>
         """,
@@ -376,7 +396,29 @@ def render_cache_expander():
 
 
 # ============================================================
-# Chapter 10. 로그인 전 화면
+# Chapter 10. 저작권 안내 영역
+# ============================================================
+# Minecraft 관련 명칭과 이미지가 Mojang/Microsoft의 자산일 수 있음을 안내합니다.
+# 과제용 비공식 프로젝트임을 첫 화면에 명확히 표시합니다.
+def render_copyright_notice():
+    st.markdown(
+        """
+        <div class="copyright-box">
+            <div class="copyright-title">저작권 안내</div>
+            <div class="copyright-text">
+                이 웹앱은 <strong>학습 및 과제 제출을 위한 비공식 팬 제작물</strong>입니다.<br>
+                Minecraft 및 관련 명칭, 아이템 이미지는 Mojang Studios 및 Microsoft의 자산일 수 있습니다.<br>
+                본 프로젝트는 Mojang Studios 또는 Microsoft와 공식적으로 관련이 없습니다.<br>
+                사용된 이미지는 <strong>광운대학교 정보융합학부 오픈소스소프트웨어실습</strong> 과제 시연 목적이며, 상업적 용도로 사용하지 않습니다.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# ============================================================
+# Chapter 11. 로그인 전 화면
 # ============================================================
 def render_login_page():
     render_app_title()
@@ -420,9 +462,11 @@ def render_login_page():
         unsafe_allow_html=True,
     )
 
+    render_copyright_notice()
+
 
 # ============================================================
-# Chapter 11. 퀴즈 HTML 컴포넌트 생성
+# Chapter 12. 퀴즈 HTML 컴포넌트 생성
 # ============================================================
 def build_quiz_html(recipes, items):
     recipes_json = json.dumps(recipes, ensure_ascii=False)
@@ -1068,7 +1112,7 @@ render();
 
 
 # ============================================================
-# Chapter 12. 로그인 후 실제 퀴즈 화면
+# Chapter 13. 로그인 후 실제 퀴즈 화면
 # ============================================================
 def render_quiz_page():
     render_app_title()
@@ -1091,7 +1135,7 @@ def render_quiz_page():
 
 
 # ============================================================
-# Chapter 13. main 함수
+# Chapter 14. main 함수
 # ============================================================
 def main():
     st.set_page_config(
@@ -1110,7 +1154,7 @@ def main():
 
 
 # ============================================================
-# Chapter 14. 실행 진입점
+# Chapter 15. 실행 진입점
 # ============================================================
 if __name__ == "__main__":
     main()
